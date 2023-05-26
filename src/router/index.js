@@ -51,7 +51,7 @@ export const constantRoutes = [
       {
         path: "dashboard",
         name: "Dashboard",
-        component: () => import("@/views/dashboard/index"),
+        component: () => import("@/views/Dashboard/index"),
         meta: { title: "介绍", icon: "dashboard" },
       },
     ],
@@ -76,18 +76,39 @@ export const constantRoutes = [
     path: "/search",
     component: Layout,
     meta: { title: "查询", icon: "search" },
-    redirect: "/search/complex-search",
+    redirect: "/search-single-news",
     children: [
       {
+        path: "/search-single-news",
+        component: () => import("@/views/SearchSingleNews/index"),
+        name: "SearchSingleNews",
+        meta: { title: "单条新闻查询" },
+      },
+      {
+        path: "/search-news-by-topic",
+        component: () => import("@/views/SearchNewsByTopic/index"),
+        name: "SearchNewsByTopic",
+        meta: { title: "新闻种类变化查询" },
+      },
+      {
+        path: "/statistical-query-on-interests",
+        component: () => import("@/views/StatisticalQueryOnInterests/index"),
+        name: "StatisticalQueryOnInterests",
+        meta: { title: "兴趣变化统计查询" },
+      },
+      {
         path: "/complex-search",
-        component: () => import("@/views/complex_search/index"),
+        component: () => import("@/views/ComplexSearch/index"),
+        name: "ComplexSearch",
         meta: { title: "组合查询" },
       },
       {
-        path: "/relation-search",
-        component: () => import("@/views/relation_search/index"),
-        meta: { title: "关系查询" },
-      },
+        path: "/recommend-news",
+        component: () => import("@/views/RecommendNews/index"),
+        name: "RecommendNews",
+        meta: { title: "实时新闻推荐" },
+      }
+
     ],
   },
 

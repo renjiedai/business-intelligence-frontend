@@ -53,6 +53,7 @@ export default {
       this.$axios.get("/spark/bytime/year", { params: { year: 2008 } });
       this.$axios.get("/mysql/bytime/year", { params: { year: 2008 } });
       this.$axios.get("/neo4j/bytime/year", { params: { year: 2008 } });
+      this.$axios.post("/spark/bytime/month", { data: { month: 4 } });
     },
   }
 }
