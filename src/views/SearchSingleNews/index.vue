@@ -44,11 +44,8 @@
         <el-divider direction="vertical" />
       </el-col>
       <el-col :span="10">
-        <el-tabs v-model="activeName" >
-          <el-tab-pane label="查询结果" name="search_res">
-            <div>111</div>
-          </el-tab-pane>
-        </el-tabs>
+          <div>111</div>
+          <div id="lineChart" style="width: 600px; height: 400px;"></div>
       </el-col>
     </el-row>
   </div>
@@ -63,12 +60,111 @@ export default {
         newsId:"",
         selectedDateRange: "",
       },
+      pickerOptions: {
+        shortcuts: [
+          {
+            text: "最近一天",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近三天",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 3);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+          {
+            text: "最近一周",
+            onClick(picker) {
+              const end = new Date();
+              const start = new Date();
+              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+              picker.$emit("pick", [start, end]);
+            },
+          },
+        ],
+      },
+      date_popularity: [],
     }
+  },
+  mounted() {
+    this.$echarts.init(document.getElementById("lineChart"));
   },
   methods: {
     search(form) {
-      console.log(form);
+      // console.log(form.selectedDateRange[0].toString());
+      if (form.newsId == "") {
+        this.$message({
+          message: "请输入新闻ID",
+          type: "warning",
+        });
+        return;
+      }
+      // 这里或许也可以不要判断时间，后台给个默认
+      if (form.selectedDateRange == "") {
+        this.$message({
+          message: "请选择起止时间",
+          type: "warning",
+        });
+        return;
+      }
+      this.drawLineChart();
+      // 这里调用后台接口，传入form.newsId和form.selectedDateRange
+      // 后台返回的数据格式为：[{"date": "2020-01-01", "popularity": [100,150...]}, {"date": "2020-01-02", "popularity": [120,150...]}, ...]
+      // 这里的popularity是一个数组，数组的长度为4，每个元素代表6个小时的流行度
+      this.$axios
+        .post("/mysql/singlenews/popularity", {
+          newsId: form.newsId,
+          startDate: form.selectedDateRange[0].toString(),
+          endDate: form.selectedDateRange[1].toString(),
+        })
+        .then((res) => {
+          // 处理返回的逻辑
+          console.log(res);
+          this.date_popularity = res.data;
+          
+        }
+        
+        )
+  
+
     },
+    drawLineChart() {
+      // 创建折线图实例
+      const lineChart = this.$echarts.init(document.getElementById('lineChart'));
+
+      // 定义时间数组和新闻热度数值数组
+      const timeArray = ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05"];
+      const hotnessArray = [10, 20, 15, 30, 25];
+
+      // 配置折线图的选项
+      const options = {
+        xAxis: {
+          type: 'category',
+          data: timeArray,
+          boundaryGap: false, // 横轴不留白
+          name: '时间' // 横轴名称
+        },
+        yAxis: {
+          type: 'value',
+          name: '新闻热度' // 纵轴名称
+        },
+        series: [{
+          data: hotnessArray,
+          type: 'line'
+        }]
+      };
+
+      // 使用配置项绘制折线图
+      lineChart.setOption(options);
+    }
   },
 };
 
