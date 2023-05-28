@@ -12,15 +12,14 @@
           style="padding-top: 5vh"
         >
           <el-form-item label="新闻种类">
-            <el-autocomplete
-              v-model="form.newsCategory"
-              :fetch-suggestions="newsCategorySuggest"
-              placeholder="请输入新闻种类名"
-              style="width: 20vw"
-              clearable
-              @select="handleSelect"
-              size="small"
-            />
+            <el-select v-model="form.newsCategory" placeholder="请选择" size="small">
+              <el-option
+                v-for="option in sortedNewsCategorys"
+                :key="option.value"
+                :label="option.label"
+                :value="option.value"
+              ></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="起止时间">
             <el-date-picker
@@ -30,6 +29,7 @@
               end-placeholder="结束日期"
               :picker-options="pickerOptions"
               style="width: 20vw"
+              size="small"
             ></el-date-picker>
           </el-form-item>
         </el-form>
@@ -63,33 +63,43 @@ export default {
         newsCategory:"",
         selectedDateRange: [],
       },
+      pickerOptions: {
+        disabledDate(time) {
+          const start = new Date('2023-05-01'); // 设置开始日期
+          const end = new Date('2023-06-01'); // 设置结束日期
+          return time < start || time > end;
+        }
+      },
+      newsCategorys: [ // 下拉选项的数据
+        { label: 'sports', value: 'sports' },
+        { label: 'news', value: 'news' },
+        { label: 'autos', value: 'autos' },
+        { label: 'foodanddrink', value: 'foodanddrink' },
+        { label: 'finance', value: 'finance' },
+        { label: 'music', value: 'music' },
+        { label: 'lifestyle', value: 'lifestyle' },
+        { label: 'weather', value: 'weather' },
+        { label: 'health', value: 'health' },
+        { label: 'video', value: 'video' },
+        { label: 'movies', value: 'movies' },
+        { label: 'tv', value: 'tv' },
+        { label: 'travel', value: 'travel' },
+        { label: 'entertainment', value: 'entertainment' },
+        { label: 'kids', value: 'kids' },
+        { label: 'europe', value: 'europe' },
+        { label: 'northamerica', value: 'northamerica' },
+        { label: 'adexperience', value: 'adexperience' }
+      ],
       
     }
   },
+  computed: {
+    sortedNewsCategorys() {
+      // 使用 sort() 方法按照选项的 label 属性进行排序
+      return this.newsCategorys.slice().sort((a, b) => a.label.localeCompare(b.label));
+    }
+  },
   methods: {
-    newsCategorySuggest(queryString, cb) {
-      //新闻类别搜索建议
-      this.$axios
-        .get("/mysql/suggest/movie", {
-          params: {
-            title: queryString,
-            amount: 10,
-          },
-        })
-        .then((res) => {
-          console.log("这是结果", res.suggestions.length);
-          console.log("这是第一条", res.suggestions[0]);
-          var result = [];
-          for (var i = 0; i < res.suggestions.length; i++) {
-            result.push({ value: res.suggestions[i] });
-          }
-          console.log("这是result", result);
-          cb(result);
-        })
-        .catch((err) => {
-          this.$message.error("当前网络异常，请稍后再试");
-        });
-    },
     fromDate2String(date) {
       const year = date.getFullYear(); // 获取年份
       const month = String(date.getMonth() + 1).padStart(2, '0'); // 获取月份，注意月份从 0 开始，需要加 1，然后补零
@@ -120,7 +130,7 @@ export default {
       // 后台返回的数据格式为：[{"date": "2020-01-01", "popularity": [100,150...]}, {"date": "2020-01-02", "popularity": [120,150...]}, ...]
       // 这里的popularity是一个数组，数组的长度为4，每个元素代表6个小时的流行度
       this.$axios
-        .post("/mysql/newstopic/popularity", {
+        .post("/newstopic/popularity", {
           newsCategory: form.newsCategory,
           startDate: this.fromDate2String(form.selectedDateRange[0]),
           endDate: this.fromDate2String(form.selectedDateRange[1]),
@@ -130,9 +140,7 @@ export default {
           console.log(res);
           this.date_popularity = res.data;
           
-        }
-        
-        )
+        })
   
 
     },

@@ -11,12 +11,23 @@
           label-width="120px"
           style="padding-top: 5vh"
         >
-          <el-form-item label="新闻ID">
+          <!-- <el-form-item label="新闻ID">
             <el-input
               v-model="form.newsId"
               placeholder="请输入新闻ID"
               style="width: 20vw"
             ></el-input>
+          </el-form-item> -->
+          <el-form-item label="新闻标题">
+            <el-autocomplete
+              v-model="form.newsHeadline"
+              :fetch-suggestions="newsHeadlineSearchSuggest"
+              placeholder="请输入新闻标题"
+              style="width: 20vw"
+              clearable
+              @select="handleSelect"
+              size="small"
+            />
           </el-form-item>
           <el-form-item label="起止时间">
             <el-date-picker
@@ -26,6 +37,7 @@
               end-placeholder="结束日期"
               :picker-options="pickerOptions"
               style="width: 20vw"
+              size="small"
             ></el-date-picker>
           </el-form-item>
         </el-form>
@@ -57,38 +69,15 @@ export default {
     return{
       form: {
         newsId:"",
+        newsHeadline: "",
         selectedDateRange: "",
       },
       pickerOptions: {
-        shortcuts: [
-          {
-            text: "最近一天",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24);
-              picker.$emit("pick", [start, end]);
-            },
-          },
-          {
-            text: "最近三天",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 3);
-              picker.$emit("pick", [start, end]);
-            },
-          },
-          {
-            text: "最近一周",
-            onClick(picker) {
-              const end = new Date();
-              const start = new Date();
-              start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit("pick", [start, end]);
-            },
-          },
-        ],
+        disabledDate(time) {
+          const start = new Date('2023-05-01'); // 设置开始日期
+          const end = new Date('2023-06-01'); // 设置结束日期
+          return time < start || time > end;
+        }
       },
       date_popularity: [],
     }
@@ -97,6 +86,32 @@ export default {
     this.$echarts.init(document.getElementById("lineChart"));
   },
   methods: {
+    handleSelect(item) {
+      console.log(item);
+    },
+    newsHeadlineSearchSuggest(queryString, cb) {
+      // 新闻标题搜索建议
+      this.$axios
+        .get("/suggest/newsheadline", {
+          params: {
+            headline: queryString,
+            amount: 10,
+          },
+        })
+        .then((res) => {
+          console.log("这是结果", res.suggestions.length);
+          console.log("这是第一条", res.suggestions[0]);
+          var result = [];
+          for (var i = 0; i < res.suggestions.length; i++) {
+            result.push({ value: res.suggestions[i] });
+          }
+          console.log("这是result", result);
+          cb(result);
+        })
+        .catch((err) => {
+          this.$message.error("当前网络异常，请稍后再试");
+        });
+    },
     fromDate2String(date) {
       const year = date.getFullYear(); // 获取年份
       const month = String(date.getMonth() + 1).padStart(2, '0'); // 获取月份，注意月份从 0 开始，需要加 1，然后补零
@@ -107,9 +122,9 @@ export default {
     },
     search(form) {
       // console.log(form.selectedDateRange[0].toString());
-      if (form.newsId == "") {
+      if (form.newsHeadline == "") {
         this.$message({
-          message: "请输入新闻ID",
+          message: "请输入新闻标题",
           type: "warning",
         });
         return;
@@ -127,8 +142,8 @@ export default {
       // 后台返回的数据格式为：[{"date": "2020-01-01", "popularity": [100,150...]}, {"date": "2020-01-02", "popularity": [120,150...]}, ...]
       // 这里的popularity是一个数组，数组的长度为4，每个元素代表6个小时的流行度
       this.$axios
-        .post("/mysql/singlenews/popularity", {
-          newsId: form.newsId,
+        .post("/singlenews/popularity", {
+          newsHeadline: form.newsHeadline,
           startDate: this.fromDate2String(form.selectedDateRange[0]),
           endDate: this.fromDate2String(form.selectedDateRange[1]),
         })
