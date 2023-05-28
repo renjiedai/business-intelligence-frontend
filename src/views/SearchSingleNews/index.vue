@@ -44,7 +44,6 @@
         <el-divider direction="vertical" />
       </el-col>
       <el-col :span="10">
-          <div>111</div>
           <div id="lineChart" style="width: 600px; height: 400px;"></div>
       </el-col>
     </el-row>
@@ -98,6 +97,14 @@ export default {
     this.$echarts.init(document.getElementById("lineChart"));
   },
   methods: {
+    fromDate2String(date) {
+      const year = date.getFullYear(); // 获取年份
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // 获取月份，注意月份从 0 开始，需要加 1，然后补零
+      const day = String(date.getDate()).padStart(2, '0'); // 获取日期，补零
+
+      const formattedDate = `${year}-${month}-${day}`; // 拼接为 "YYYY-MM-DD" 格式的字符串
+      return formattedDate;
+    },
     search(form) {
       // console.log(form.selectedDateRange[0].toString());
       if (form.newsId == "") {
@@ -122,8 +129,8 @@ export default {
       this.$axios
         .post("/mysql/singlenews/popularity", {
           newsId: form.newsId,
-          startDate: form.selectedDateRange[0].toString(),
-          endDate: form.selectedDateRange[1].toString(),
+          startDate: this.fromDate2String(form.selectedDateRange[0]),
+          endDate: this.fromDate2String(form.selectedDateRange[1]),
         })
         .then((res) => {
           // 处理返回的逻辑
@@ -164,7 +171,7 @@ export default {
 
       // 使用配置项绘制折线图
       lineChart.setOption(options);
-    }
+    },
   },
 };
 
