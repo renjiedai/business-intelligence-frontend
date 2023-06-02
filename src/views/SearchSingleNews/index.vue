@@ -11,13 +11,6 @@
           label-width="120px"
           style="padding-top: 5vh"
         >
-          <!-- <el-form-item label="新闻ID">
-            <el-input
-              v-model="form.newsId"
-              placeholder="请输入新闻ID"
-              style="width: 20vw"
-            ></el-input>
-          </el-form-item> -->
           <el-form-item label="新闻标题">
             <el-autocomplete
               v-model="form.newsHeadline"
@@ -29,15 +22,26 @@
               size="small"
             />
           </el-form-item>
-          <el-form-item label="起止时间">
+          <el-form-item label="开始时间">
             <el-date-picker
-              v-model="form.selectedDateRange"
-              type="daterange"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
+              v-model="form.selectedStartDateTime"
+              type="datetime"
+              placeholder="选择日期时间"
+              format="yyyy-MM-dd HH:mm:ss"
               :picker-options="pickerOptions"
-              style="width: 20vw"
-              size="small"
+              style="width: 200px"
+              size = "small"
+            ></el-date-picker>
+          </el-form-item>
+          <el-form-item label="结束时间">
+            <el-date-picker
+              v-model="form.selectedEndDateTime"
+              type="datetime"
+              placeholder="选择日期时间"
+              format="yyyy-MM-dd HH:mm:ss"
+              :picker-options="pickerOptions"
+              style="width: 200px"
+              size = "small"
             ></el-date-picker>
           </el-form-item>
         </el-form>
@@ -68,18 +72,20 @@ export default {
   data() {
     return{
       form: {
-        newsId:"",
         newsHeadline: "",
-        selectedDateRange: "",
+        selectedStartDateTime: '',
+        selectedEndDateTime: '',
       },
       pickerOptions: {
         disabledDate(time) {
           const start = new Date('2023-05-01'); // 设置开始日期
-          const end = new Date('2023-06-01'); // 设置结束日期
+          const end = new Date('2023-06-11'); // 设置结束日期
           return time < start || time > end;
         }
       },
-      date_popularity: [],
+      time_array: [],
+      popularity_array: [],
+      suggestions_result: {},
     }
   },
   mounted() {
@@ -92,36 +98,50 @@ export default {
     newsHeadlineSearchSuggest(queryString, cb) {
       // 新闻标题搜索建议
       this.$axios
-        .get("/suggest/newsheadline", {
+        .get("/suggest/headline", {
           params: {
             headline: queryString,
             amount: 10,
           },
         })
         .then((res) => {
-          console.log("这是结果", res.suggestions.length);
-          console.log("这是第一条", res.suggestions[0]);
-          var result = [];
+          // console.log("这是结果", res.suggestions.length);
+          // console.log("这是第一条", res.suggestions[0]);
+          var result_name = []
           for (var i = 0; i < res.suggestions.length; i++) {
-            result.push({ value: res.suggestions[i] });
+            this.suggestions_result[res.suggestions[i]['name']] = res.suggestions[i]['id']
+            result_name.push({ value: res.suggestions[i]['name'] });
           }
-          console.log("这是result", result);
-          cb(result);
+          cb(result_name);
         })
         .catch((err) => {
           this.$message.error("当前网络异常，请稍后再试");
         });
     },
-    fromDate2String(date) {
-      const year = date.getFullYear(); // 获取年份
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // 获取月份，注意月份从 0 开始，需要加 1，然后补零
-      const day = String(date.getDate()).padStart(2, '0'); // 获取日期，补零
+    fromDate2String(dateString) {
 
-      const formattedDate = `${year}-${month}-${day}`; // 拼接为 "YYYY-MM-DD" 格式的字符串
+      // 创建 Date 对象并传入原始日期字符串
+      var dateObject = new Date(dateString);
+
+      // 获取年、月、日、小时、分钟和秒
+      var year = dateObject.getFullYear();
+      var month = dateObject.getMonth() + 1;
+      var day = dateObject.getDate();
+      var hours = dateObject.getHours();
+      var minutes = dateObject.getMinutes();
+      var seconds = dateObject.getSeconds();
+
+      // 格式化为所需的日期时间字符串
+      var formattedDate = year + "-" + (month < 10 ? "0" + month : month) + "-" + (day < 10 ? "0" + day : day) + " " +
+                          (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" +
+                          (seconds < 10 ? "0" + seconds : seconds);
       return formattedDate;
     },
+    fromJson2List(item) {
+      this.time_array.push(item.datetime.slice(5,10));
+      this.popularity_array.push(item.popularity);
+    },
     search(form) {
-      // console.log(form.selectedDateRange[0].toString());
       if (form.newsHeadline == "") {
         this.$message({
           message: "请输入新闻标题",
@@ -130,7 +150,7 @@ export default {
         return;
       }
       // 这里或许也可以不要判断时间，后台给个默认
-      if (form.selectedDateRange == "") {
+      if (form.selectedStartDateTime == ""||form.selectedEndDateTime == "") {
         this.$message({
           message: "请选择起止时间",
           type: "warning",
@@ -138,24 +158,24 @@ export default {
         return;
       }
       this.drawLineChart();
-      // 这里调用后台接口，传入form.newsId和form.selectedDateRange
-      // 后台返回的数据格式为：[{"date": "2020-01-01", "popularity": [100,150...]}, {"date": "2020-01-02", "popularity": [120,150...]}, ...]
-      // 这里的popularity是一个数组，数组的长度为4，每个元素代表6个小时的流行度
       this.$axios
-        .post("/singlenews/popularity", {
-          newsHeadline: form.newsHeadline,
-          startDate: this.fromDate2String(form.selectedDateRange[0]),
-          endDate: this.fromDate2String(form.selectedDateRange[1]),
+        .get("/news/popularity", {
+          params: {
+            newsID: this.suggestions_result[form.newsHeadline],
+            startDate: this.fromDate2String(form.selectedStartDateTime),
+            endDate: this.fromDate2String(form.selectedEndDateTime),
+          },
         })
         .then((res) => {
-          // 处理返回的逻辑
-          console.log(res);
-          this.date_popularity = res.data;
-          
-        }
-        
-        )
-  
+          console.log("这是结果", res);
+          this.time_array = [];
+          this.popularity_array = [];
+          res.data.forEach(this.fromJson2List);
+          this.drawLineChart();
+        })
+        .catch((err) => {
+          this.$message.error("当前网络异常，请稍后再试");
+        });  
 
     },
     drawLineChart() {
@@ -163,14 +183,14 @@ export default {
       const lineChart = this.$echarts.init(document.getElementById('lineChart'));
 
       // 定义时间数组和新闻热度数值数组
-      const timeArray = ["2023-01-01", "2023-01-02", "2023-01-03", "2023-01-04", "2023-01-05"];
-      const hotnessArray = [10, 20, 15, 30, 25];
+      // const timeArray = ["01-01", "01-02", "01-03", "01-04", "01-05","01-06", "01-07", "01-08", "01-09", "01-10"];
+      // const hotnessArray = [10, 20, 15, 30, 25, 10, 20, 15, 30, 25];
 
       // 配置折线图的选项
       const options = {
         xAxis: {
           type: 'category',
-          data: timeArray,
+          data: this.time_array,
           boundaryGap: false, // 横轴不留白
           name: '时间' // 横轴名称
         },
@@ -179,7 +199,7 @@ export default {
           name: '新闻热度' // 纵轴名称
         },
         series: [{
-          data: hotnessArray,
+          data: this.popularity_array,
           type: 'line'
         }]
       };
