@@ -132,7 +132,7 @@ export default {
                           (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" +
                           (seconds < 10 ? "0" + seconds : seconds);
       return formattedDate;
-      },
+    },
     findIndexByValue(value) {
       const index = this.newsCategorys.findIndex(item => item.value === value);
       return index;
