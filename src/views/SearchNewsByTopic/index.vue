@@ -12,7 +12,7 @@
           style="padding-top: 5vh"
         >
           <el-form-item label="新闻种类">
-            <el-select v-model="form.newsCategory" placeholder="请选择" size="small">
+            <el-select v-model="form.newsCategory" placeholder="请选择" style="width: 20vw" size="small">
               <el-option
                 v-for="option in sortedNewsCategorys"
                 :key="option.value"
@@ -28,7 +28,7 @@
               placeholder="选择日期时间"
               format="yyyy-MM-dd HH:mm:ss"
               :picker-options="pickerOptions"
-              style="width: 200px"
+              style="width: 20vw"
               size = "small"
             ></el-date-picker>
           </el-form-item>
@@ -39,7 +39,7 @@
               placeholder="选择日期时间"
               format="yyyy-MM-dd HH:mm:ss"
               :picker-options="pickerOptions"
-              style="width: 200px"
+              style="width: 20vw"
               size = "small"
             ></el-date-picker>
           </el-form-item>

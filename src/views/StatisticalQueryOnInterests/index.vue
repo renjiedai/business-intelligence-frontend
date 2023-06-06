@@ -39,7 +39,7 @@
               placeholder="选择日期时间"
               format="yyyy-MM-dd HH:mm:ss"
               :picker-options="pickerOptions"
-              style="width: 200px"
+              style="width: 20vw"
               size = "small"
             ></el-date-picker>
           </el-form-item>
@@ -50,7 +50,7 @@
               placeholder="选择日期时间"
               format="yyyy-MM-dd HH:mm:ss"
               :picker-options="pickerOptions"
-              style="width: 200px"
+              style="width: 20vw"
               size = "small"
             ></el-date-picker>
           </el-form-item>
@@ -183,7 +183,7 @@ export default {
     search(form) {
       if (form.userID == "") {
         this.$message({
-          message: "请输入新闻标题",
+          message: "请输入用户ID",
           type: "warning",
         });
         return;

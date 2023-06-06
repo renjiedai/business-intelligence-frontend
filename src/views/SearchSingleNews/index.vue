@@ -29,7 +29,7 @@
               placeholder="选择日期时间"
               format="yyyy-MM-dd HH:mm:ss"
               :picker-options="pickerOptions"
-              style="width: 200px"
+              style="width: 20vw"
               size = "small"
             ></el-date-picker>
           </el-form-item>
@@ -40,7 +40,7 @@
               placeholder="选择日期时间"
               format="yyyy-MM-dd HH:mm:ss"
               :picker-options="pickerOptions"
-              style="width: 200px"
+              style="width: 20vw"
               size = "small"
             ></el-date-picker>
           </el-form-item>
