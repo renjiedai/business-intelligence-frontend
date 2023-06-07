@@ -1,8 +1,10 @@
 import axios from "axios";
 import { Message } from "element-ui";
+import request from "@/utils/request";
 
 // let BASE_URL = "http://47.101.216.242:5000/";
-let BASE_URL = "http://127.0.0.1:4523/m1/2785405-0-default/";
+let BASE_URL = "http://127.0.0.1:5000/";
+// let BASE_URL = "http://127.0.0.1:4523/m1/2785405-0-default/";
 
 // create an axios instance
 const my_axios = axios.create({
@@ -14,6 +16,7 @@ const my_axios = axios.create({
 my_axios.interceptors.request.use(
   (config) => {
     // do something before request is sent
+    console.log(config)
     return config;
   },
   (error) => {

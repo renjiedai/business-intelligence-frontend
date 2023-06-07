@@ -77,8 +77,8 @@ export default {
       },
       pickerOptions: {
         disabledDate(time) {
-          const start = new Date('2023-05-01'); // 设置开始日期
-          const end = new Date('2023-06-01'); // 设置结束日期
+          const start = new Date('2019-06-12'); // 设置开始日期
+          const end = new Date('2019-07-11'); // 设置结束日期
           return time < start || time > end;
         }
       },
@@ -104,7 +104,7 @@ export default {
       ],
       time_array: [],
       popularity_array: [],
-      
+
     }
   },
   computed: {
@@ -158,12 +158,14 @@ export default {
         });
         return;
       }
+      console.log(this.fromDate2String(form.selectedStartDateTime))
       this.$axios
       .get("/category/popularity", {
+        params:{
         categoryID: this.findIndexByValue(form.newsCategory),
         startDate: this.fromDate2String(form.selectedStartDateTime),
-        endDate: this.fromDate2String(form.selectedEndDateTime),
-      })
+        endDate: this.fromDate2String(form.selectedEndDateTime)
+      }})
       .then((res) => {
         console.log("这是结果", res);
         this.time_array = [];
@@ -173,8 +175,8 @@ export default {
       })
       .catch((err) => {
         this.$message.error("当前网络异常，请稍后再试");
-      });  
-  
+      });
+
 
     },
     drawLineChart() {

@@ -1,4 +1,4 @@
-<template> 
+<template>
   <div class="app-container">
     <h1>
     对单个新闻的生命周期的查询，可以展示单个新闻在不同时间段的流行变化
@@ -78,8 +78,8 @@ export default {
       },
       pickerOptions: {
         disabledDate(time) {
-          const start = new Date('2023-05-01'); // 设置开始日期
-          const end = new Date('2023-06-11'); // 设置结束日期
+          const start = new Date('2019-06-12'); // 设置开始日期
+          const end = new Date('2019-07-11'); // 设置结束日期
           return time < start || time > end;
         }
       },
@@ -175,7 +175,7 @@ export default {
         })
         .catch((err) => {
           this.$message.error("当前网络异常，请稍后再试");
-        });  
+        });
 
     },
     drawLineChart() {

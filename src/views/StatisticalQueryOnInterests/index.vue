@@ -1,4 +1,4 @@
-<template> 
+<template>
   <div class="app-container">
     <h1>
       对用户兴趣变化的统计查询
@@ -89,8 +89,8 @@ export default {
       },
       pickerOptions: {
         disabledDate(time) {
-          const start = new Date('2023-05-01'); // 设置开始日期
-          const end = new Date('2023-06-01'); // 设置结束日期
+          const start = new Date('2019-06-12'); // 设置开始日期
+          const end = new Date('2019-07-11'); // 设置结束日期
           return time < start || time > end;
         }
       },
@@ -221,7 +221,7 @@ export default {
           this.my_legend = this.newsCategorys.map(function(item) {
               return item.label;
             });
-          for (var i = 0; i < this.date_popularity.length; i++) {         
+          for (var i = 0; i < this.date_popularity.length; i++) {
             this.time_array = [];
             this.popularity_array = [];
             this.date_popularity[i].trends.forEach(this.fromJson2List);
@@ -237,9 +237,9 @@ export default {
           // console.log(this.my_legend)
           this.drawLineChart();
         }
-        
+
         )
-  
+
 
     },
     drawLineChart() {
