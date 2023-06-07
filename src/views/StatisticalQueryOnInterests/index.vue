@@ -84,8 +84,8 @@ export default {
       form: {
         userID:"",
         newsCategory: [],
-        selectedStartDateTime: "",
-        selectedEndDateTime: "",
+        selectedStartDateTime: "Thu Jun 13 2019 00:00:00 GMT+0800 (中国标准时间)",
+        selectedEndDateTime: "Thu Jul 11 2019 00:00:00 GMT+0800 (中国标准时间)",
       },
       pickerOptions: {
         disabledDate(time) {
@@ -220,7 +220,7 @@ export default {
           this.my_series = [];
           this.my_legend = this.newsCategorys.map(function(item) {
               return item.label;
-            });
+            });          
           for (var i = 0; i < this.date_popularity.length; i++) {
             this.time_array = [];
             this.popularity_array = [];
@@ -231,8 +231,10 @@ export default {
               data: this.popularity_array
             }
             this.my_series.push(temp_dict)
+
             // date_popularity[i].trends.forEach(this.fromJson2List);
           }
+          console.log(this.time_array)
           // console.log(this.my_series)
           // console.log(this.my_legend)
           this.drawLineChart();
@@ -254,11 +256,12 @@ export default {
       // 配置折线图的选项
       const options = {
         legend: {
-          data: this.my_legend
+          data: this.my_legend,
+          top: 'bottom'
         },
         xAxis: {
           type: 'category',
-          data: timeArray,
+          data: this.time_array,
           boundaryGap: false, // 横轴不留白
           name: '时间' // 横轴名称
         },

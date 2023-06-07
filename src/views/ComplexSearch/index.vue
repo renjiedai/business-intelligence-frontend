@@ -32,6 +32,7 @@
               style="width: 20vw"
               size = "small"
             ></el-date-picker>
+            <div>结束时间 {{ this.form.selectedEndDateTime }}</div>
           </el-form-item>
           <el-form-item label="新闻种类">
             <el-select v-model="form.selectedNewsCategorys" placeholder="请选择" multiple filterable style="width: 20vw" size="small">
@@ -119,8 +120,8 @@
       <el-col :span="10">
           <!-- <div id="lineChart" style="width: 600px; height: 400px;"></div> -->
           <div>
-            <el-card v-for="item in news_result" :key="item.id" :header="item.headline">
-              <img :src="item.topic" alt="Topic" style="width: 100%">
+            <el-card v-for="item in news_result" :key="item.id" :header="item.headline" style="margin-bottom: 1vh;">
+              <p>Topic: {{ item.topic }}</p>
               <p>Category: {{ item.category }}</p>
             </el-card>
           </div>
@@ -138,16 +139,16 @@ export default {
       form: {
         userIDs:[],
         selectedNewsCategorys: [],
-        selectedStartDateTime: "",
-        selectedEndDateTime: "",
+        selectedStartDateTime: "Thu Jun 13 2019 00:00:00 GMT+0800 (中国标准时间)",
+        selectedEndDateTime: "Thu Jul 11 2019 00:00:00 GMT+0800 (中国标准时间)",
         min_headline_length: 1,
         max_headline_length: 1000,
         min_duration: 0,
       },
       pickerOptions: {
         disabledDate(time) {
-          const start = new Date('2023-05-01'); // 设置开始日期
-          const end = new Date('2023-06-01'); // 设置结束日期
+          const start = new Date('2019-06-12'); // 设置开始日期
+          const end = new Date('2019-07-11'); // 设置结束日期
           return time < start || time > end;
         }
       },
@@ -295,7 +296,16 @@ export default {
         });
         return;
       }
+      console.log("这是form", {
+          users: form.userIDs.map(str => parseInt(str)),
+          categories:this.fromCategory2Int(form.selectedNewsCategorys),
+          startDate: this.fromDate2String(form.selectedStartDateTime),
+          endDate: this.fromDate2String(form.selectedEndDateTime),
+          clickMinTime: form.min_duration,
+          titleMinLength:form.min_headline_length,
+          titleMaxLength:form.max_headline_length,
 
+        });
       this.$axios
         .post("/complex_search", {
           users: form.userIDs.map(str => parseInt(str)),

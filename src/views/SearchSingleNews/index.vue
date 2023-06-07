@@ -73,8 +73,8 @@ export default {
     return{
       form: {
         newsHeadline: "",
-        selectedStartDateTime: '',
-        selectedEndDateTime: '',
+        selectedStartDateTime: "Thu Jun 13 2019 00:00:00 GMT+0800 (中国标准时间)",
+        selectedEndDateTime: "Thu Jul 11 2019 00:00:00 GMT+0800 (中国标准时间)",
       },
       pickerOptions: {
         disabledDate(time) {
