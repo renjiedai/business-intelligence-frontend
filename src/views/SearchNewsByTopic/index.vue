@@ -135,7 +135,7 @@ export default {
     },
     findIndexByValue(value) {
       const index = this.newsCategorys.findIndex(item => item.value === value);
-      return index;
+      return index + 1;
     },
     fromJson2List(item) {
       this.time_array.push(item.datetime.slice(5,10));

@@ -259,6 +259,10 @@ export default {
           data: this.my_legend,
           top: 'bottom'
         },
+        grid: {
+          top: '10%', // 距离容器顶部的距离为 10%
+          bottom: '30%'
+        },
         xAxis: {
           type: 'category',
           data: this.time_array,

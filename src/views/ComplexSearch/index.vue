@@ -32,7 +32,7 @@
               style="width: 20vw"
               size = "small"
             ></el-date-picker>
-            <div>结束时间 {{ this.form.selectedEndDateTime }}</div>
+            <!-- <div>结束时间 {{ this.form.selectedEndDateTime }}</div> -->
           </el-form-item>
           <el-form-item label="新闻种类">
             <el-select v-model="form.selectedNewsCategorys" placeholder="请选择" multiple filterable style="width: 20vw" size="small">
@@ -118,11 +118,11 @@
         <el-divider direction="vertical" />
       </el-col>
       <el-col :span="10">
-          <!-- <div id="lineChart" style="width: 600px; height: 400px;"></div> -->
-          <div>
+          <div style="height: 90vh; overflow-y: auto;">
             <el-card v-for="item in news_result" :key="item.id" :header="item.headline" style="margin-bottom: 1vh;">
               <p>Topic: {{ item.topic }}</p>
               <p>Category: {{ item.category }}</p>
+              <p>ID: {{ item.id }}</p>
             </el-card>
           </div>
       </el-col>
@@ -264,7 +264,7 @@ export default {
     },
     findIndexByValue(value) {
       const index = this.newsCategorys.findIndex(item => item.value === value);
-      return index;
+      return index + 1;
     },
     fromCategory2Int(categoryList) {
       var categoryIntList = [];
