@@ -85,7 +85,7 @@ export default {
     };
   },
   mounted() {
-    this.socket = io('http://localhost:5000');
+    this.socket = io('http://47.101.216.242:5000');
     this.socket.on('update', this.handleUpdate);
     this.socket.on('news_ids', this.handleNewsIds);
     // 监听后端发送过来的 recommendations 事件
