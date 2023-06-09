@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: 'Data Warehouse Project',
+  title: 'Business Intelligence Project',
 
   /**
    * @type {boolean} true | false
