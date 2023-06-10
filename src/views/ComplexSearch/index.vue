@@ -118,13 +118,16 @@
         <el-divider direction="vertical" />
       </el-col>
       <el-col :span="10">
-          <div style="height: 90vh; overflow-y: auto;">
-            <el-card v-for="item in news_result" :key="item.id" :header="item.headline" style="margin-bottom: 1vh;">
-              <p>Topic: {{ item.topic }}</p>
-              <p>Category: {{ item.category }}</p>
-              <p>ID: {{ item.id }}</p>
-            </el-card>
-          </div>
+        <div style="margin-bottom: 1vh;">
+          共查询到{{ this.count_result }}条新闻，如下所示
+        </div>
+        <div style="height: 90vh; overflow-y: auto;">
+          <el-card v-for="item in news_result" :key="item.id" :header="item.headline" style="margin-bottom: 1vh;">
+            <p>Topic: {{ item.topic }}</p>
+            <p>Category: {{ item.category }}</p>
+            <p>ID: {{ item.id }}</p>
+          </el-card>
+        </div>
       </el-col>
     </el-row>
   </div>
@@ -178,6 +181,7 @@ export default {
       my_series: [],
       my_legend: [],
       news_result: [],
+      count_result: 0,
     }
   },
   mounted() {
@@ -320,6 +324,7 @@ export default {
         .then((res) => {
           console.log('res',res)
           this.news_result = res.data;
+          this.count_result = res.count;
           // // 处理返回的逻辑
           // this.date_popularity = res.data;
           // // 按照 id 排序
